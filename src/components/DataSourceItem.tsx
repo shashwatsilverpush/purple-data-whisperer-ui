@@ -4,7 +4,23 @@ import { DataSource } from '@/types/DataSource';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, FolderOpen, FolderClosed, FileText, Check } from 'lucide-react';
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  FolderOpen, 
+  FolderClosed, 
+  FileText, 
+  Check, 
+  Edit, 
+  Trash2, 
+  RefreshCcw 
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 
 interface DataSourceItemProps {
@@ -134,11 +150,36 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         </td>
         <td className="pr-4 py-4">
           <div className="flex items-center justify-end gap-2">
-            {dataSource.sourceType === 'Website' && (
-              <Button size="sm" variant="outline" className="text-xs">
-                Re-sync
-              </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline" className="h-8 w-8">
+                  <span className="sr-only">Open menu</span>
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <div className="flex items-center gap-2">
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600">
+                  <div className="flex items-center gap-2">
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </div>
+                </DropdownMenuItem>
+                {dataSource.sourceType === 'Website' && (
+                  <DropdownMenuItem>
+                    <div className="flex items-center gap-2">
+                      <RefreshCcw className="h-4 w-4" />
+                      Re-sync
+                    </div>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </td>
       </tr>

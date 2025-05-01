@@ -85,6 +85,27 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
     return findFolder(dataSources);
   });
 
+  // Get all selected data sources for BulkActions
+  const getSelectedSources = (): DataSource[] => {
+    const selected: DataSource[] = [];
+    
+    const findSelected = (sources: DataSource[]) => {
+      sources.forEach(source => {
+        if (selectedIds.has(source.id)) {
+          selected.push(source);
+        }
+        if (source.children) {
+          findSelected(source.children);
+        }
+      });
+    };
+    
+    findSelected(dataSources);
+    return selected;
+  };
+
+  const selectedSources = getSelectedSources();
+
   return (
     <div>
       {selectedIds.size > 0 && (
@@ -95,6 +116,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
             setSelectedIds(new Set());
             setSelectAll(false);
           }}
+          selectedSources={selectedSources}
         />
       )}
       

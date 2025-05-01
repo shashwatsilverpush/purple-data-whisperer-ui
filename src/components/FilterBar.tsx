@@ -188,48 +188,56 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </div>
       </div>
 
-      {/* Sort Controls */}
+      {/* Sort Controls - Combined into a single dropdown */}
       <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className={`bg-white border-purple-200 hover:bg-purple-50 ${
-            sortField === 'lastUpdated' ? 'text-purple-500 font-medium' : ''
-          }`}
-          onClick={() =>
-            onSortChange(
-              'lastUpdated',
-              sortField === 'lastUpdated' && sortDirection === 'asc' ? 'desc' : 'asc'
-            )
-          }
-        >
-          Sort by Last Updated
-          {sortField === 'lastUpdated' && (
-            sortDirection === 'asc' 
-              ? <ArrowUp className="ml-1 h-4 w-4" /> 
-              : <ArrowDown className="ml-1 h-4 w-4" />
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`bg-white border-purple-200 hover:bg-purple-50 ${
-            sortField === 'name' ? 'text-purple-500 font-medium' : ''
-          }`}
-          onClick={() =>
-            onSortChange(
-              'name',
-              sortField === 'name' && sortDirection === 'asc' ? 'desc' : 'asc'
-            )
-          }
-        >
-          Sort by Name
-          {sortField === 'name' && (
-            sortDirection === 'asc' 
-              ? <ArrowUp className="ml-1 h-4 w-4" /> 
-              : <ArrowDown className="ml-1 h-4 w-4" />
-          )}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-white border-purple-200 hover:bg-purple-50"
+            >
+              Sort by {sortField === 'name' ? 'Name' : 'Last Updated'}
+              {sortDirection === 'asc' ? <ArrowUp className="ml-1 h-4 w-4" /> : <ArrowDown className="ml-1 h-4 w-4" />}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => onSortChange('name', 'asc')}
+              className={sortField === 'name' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
+            >
+              <span className="flex items-center">
+                Name <ArrowUp className="ml-1 h-4 w-4" />
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onSortChange('name', 'desc')}
+              className={sortField === 'name' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
+            >
+              <span className="flex items-center">
+                Name <ArrowDown className="ml-1 h-4 w-4" />
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onSortChange('lastUpdated', 'asc')}
+              className={sortField === 'lastUpdated' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
+            >
+              <span className="flex items-center">
+                Last Updated <ArrowUp className="ml-1 h-4 w-4" />
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onSortChange('lastUpdated', 'desc')}
+              className={sortField === 'lastUpdated' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
+            >
+              <span className="flex items-center">
+                Last Updated <ArrowDown className="ml-1 h-4 w-4" />
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
