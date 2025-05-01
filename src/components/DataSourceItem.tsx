@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
+import { StatusChangeDialog } from './StatusChangeDialog';
 
 interface DataSourceItemProps {
   dataSource: DataSource;
@@ -30,6 +31,7 @@ interface DataSourceItemProps {
   onSelectChange: (id: string, selected: boolean) => void;
   onToggleChildren: (id: string) => void;
   expanded: Set<string>;
+  onStatusChange?: (id: string, newStatus: boolean) => void;
 }
 
 export const DataSourceItem: React.FC<DataSourceItemProps> = ({ 
@@ -38,10 +40,12 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   isSelected, 
   onSelectChange,
   onToggleChildren,
-  expanded
+  expanded,
+  onStatusChange
 }) => {
   const isExpanded = expanded.has(dataSource.id);
   const hasChildren = dataSource.children && dataSource.children.length > 0;
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
   
   const handleCheckboxChange = (checked: boolean) => {
     onSelectChange(dataSource.id, checked);
@@ -50,6 +54,17 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleChildren(dataSource.id);
+  };
+
+  const handleStatusClick = () => {
+    setShowStatusDialog(true);
+  };
+
+  const handleStatusConfirm = () => {
+    if (onStatusChange) {
+      onStatusChange(dataSource.id, !dataSource.isActive);
+    }
+    setShowStatusDialog(false);
   };
 
   const formattedDate = new Date(dataSource.lastUpdated).toLocaleDateString('en-US', {
@@ -116,11 +131,12 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           <Badge 
             variant={dataSource.isActive ? "default" : "outline"}
             className={cn(
-              "flex items-center gap-1 w-24 justify-center",
+              "flex items-center gap-1 w-24 justify-center cursor-pointer",
               dataSource.isActive 
                 ? "bg-green-100 text-green-800 hover:bg-green-200" 
                 : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             )}
+            onClick={handleStatusClick}
           >
             {dataSource.isActive && <Check className="h-3 w-3" />}
             {dataSource.isActive ? "Active" : "Inactive"}
@@ -193,8 +209,17 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           onSelectChange={onSelectChange}
           onToggleChildren={onToggleChildren}
           expanded={expanded}
+          onStatusChange={onStatusChange}
         />
       ))}
+
+      <StatusChangeDialog
+        isOpen={showStatusDialog}
+        onClose={() => setShowStatusDialog(false)}
+        onConfirm={handleStatusConfirm}
+        dataSourceName={dataSource.name}
+        currentStatus={dataSource.isActive}
+      />
     </>
   );
 };

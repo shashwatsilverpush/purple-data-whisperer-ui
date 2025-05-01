@@ -75,6 +75,10 @@ const Index = () => {
     }
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
     setSortField(field);
     setSortDirection(direction);
@@ -112,6 +116,30 @@ const Index = () => {
     setIdsToDelete([]);
   };
 
+  const handleStatusChange = (id: string, newStatus: boolean) => {
+    setDataSources(prevSources => {
+      const updateStatus = (sources: DataSource[]): DataSource[] => {
+        return sources.map(source => {
+          if (source.id === id) {
+            return { ...source, isActive: newStatus };
+          }
+          if (source.children) {
+            source.children = updateStatus(source.children);
+          }
+          return source;
+        });
+      };
+      
+      const updatedSources = updateStatus([...prevSources]);
+      return updatedSources;
+    });
+
+    toast({
+      title: "Status Changed",
+      description: `Data source status has been ${newStatus ? 'activated' : 'deactivated'}.`,
+    });
+  };
+
   const handleAddDataSource = (type: string, data: any) => {
     // Logic to add a new data source
     toast({
@@ -128,6 +156,7 @@ const Index = () => {
           <div className="w-72">
             <SearchBar 
               className="w-full" 
+              onSearch={handleSearch}
             />
           </div>
         </div>
@@ -148,7 +177,11 @@ const Index = () => {
           onTestDataSource={() => setShowTestModal(true)}
         />
 
-        <DataSourceList dataSources={filteredSources} onDelete={handleDelete} />
+        <DataSourceList 
+          dataSources={filteredSources} 
+          onDelete={handleDelete} 
+          onStatusChange={handleStatusChange}
+        />
       </div>
 
       <AddDataSourceModal 

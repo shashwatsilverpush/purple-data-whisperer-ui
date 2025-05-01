@@ -8,11 +8,13 @@ import { BulkActions } from './BulkActions';
 interface DataSourceListProps {
   dataSources: DataSource[];
   onDelete: (ids: string[]) => void;
+  onStatusChange?: (id: string, newStatus: boolean) => void;
 }
 
 export const DataSourceList: React.FC<DataSourceListProps> = ({
   dataSources,
   onDelete,
+  onStatusChange,
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -170,6 +172,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onSelectChange={handleToggleSelect}
                   onToggleChildren={handleToggleExpand}
                   expanded={expandedIds}
+                  onStatusChange={onStatusChange}
                 />
               ))}
             </tbody>
