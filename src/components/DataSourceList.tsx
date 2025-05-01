@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DataSourceItem } from './DataSourceItem';
 import { DataSource } from '@/types/DataSource';
@@ -9,12 +8,14 @@ interface DataSourceListProps {
   dataSources: DataSource[];
   onDelete: (ids: string[]) => void;
   onStatusChange?: (id: string, newStatus: boolean) => void;
+  onTagsChange?: (id: string, newTags: string[]) => void;
 }
 
 export const DataSourceList: React.FC<DataSourceListProps> = ({
   dataSources,
   onDelete,
   onStatusChange,
+  onTagsChange,
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -64,6 +65,12 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
     onDelete(Array.from(selectedIds));
     setSelectedIds(new Set());
     setSelectAll(false);
+  };
+
+  const handleTagsChange = (id: string, newTags: string[]) => {
+    if (onTagsChange) {
+      onTagsChange(id, newTags);
+    }
   };
 
   const getTotalCount = (sources: DataSource[]): number => {
@@ -173,6 +180,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onToggleChildren={handleToggleExpand}
                   expanded={expandedIds}
                   onStatusChange={onStatusChange}
+                  onTagsChange={handleTagsChange}
                 />
               ))}
             </tbody>

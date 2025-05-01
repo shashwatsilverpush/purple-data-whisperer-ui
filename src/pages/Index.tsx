@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { SearchBar } from '@/components/SearchBar';
@@ -140,6 +139,30 @@ const Index = () => {
     });
   };
 
+  const handleTagsChange = (id: string, newTags: string[]) => {
+    setDataSources(prevSources => {
+      const updateTags = (sources: DataSource[]): DataSource[] => {
+        return sources.map(source => {
+          if (source.id === id) {
+            return { ...source, tags: newTags };
+          }
+          if (source.children) {
+            source.children = updateTags(source.children);
+          }
+          return source;
+        });
+      };
+      
+      const updatedSources = updateTags([...prevSources]);
+      return updatedSources;
+    });
+
+    toast({
+      title: "Tags Updated",
+      description: "Data source tags have been updated.",
+    });
+  };
+
   const handleAddDataSource = (type: string, data: any) => {
     // Logic to add a new data source
     toast({
@@ -181,6 +204,7 @@ const Index = () => {
           dataSources={filteredSources} 
           onDelete={handleDelete} 
           onStatusChange={handleStatusChange}
+          onTagsChange={handleTagsChange}
         />
       </div>
 

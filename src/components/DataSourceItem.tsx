@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { StatusChangeDialog } from './StatusChangeDialog';
+import { EditableTags } from './EditableTags';
 
 interface DataSourceItemProps {
   dataSource: DataSource;
@@ -32,6 +33,7 @@ interface DataSourceItemProps {
   onToggleChildren: (id: string) => void;
   expanded: Set<string>;
   onStatusChange?: (id: string, newStatus: boolean) => void;
+  onTagsChange?: (id: string, newTags: string[]) => void;
 }
 
 export const DataSourceItem: React.FC<DataSourceItemProps> = ({ 
@@ -41,7 +43,8 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   onSelectChange,
   onToggleChildren,
   expanded,
-  onStatusChange
+  onStatusChange,
+  onTagsChange
 }) => {
   const isExpanded = expanded.has(dataSource.id);
   const hasChildren = dataSource.children && dataSource.children.length > 0;
@@ -65,6 +68,12 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
       onStatusChange(dataSource.id, !dataSource.isActive);
     }
     setShowStatusDialog(false);
+  };
+
+  const handleTagsChange = (newTags: string[]) => {
+    if (onTagsChange) {
+      onTagsChange(dataSource.id, newTags);
+    }
   };
 
   const formattedDate = new Date(dataSource.lastUpdated).toLocaleDateString('en-US', {
@@ -152,17 +161,7 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           {dataSource.subCategory}
         </td>
         <td className="px-4 py-4">
-          <div className="flex flex-wrap gap-1">
-            {dataSource.tags.map(tag => (
-              <Badge 
-                key={tag} 
-                variant="outline" 
-                className="bg-purple-50 text-purple-800 border-purple-200"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
+          <EditableTags tags={dataSource.tags} onTagsChange={handleTagsChange} />
         </td>
         <td className="pr-4 py-4">
           <div className="flex items-center justify-end gap-2">
@@ -210,6 +209,7 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           onToggleChildren={onToggleChildren}
           expanded={expanded}
           onStatusChange={onStatusChange}
+          onTagsChange={onTagsChange}
         />
       ))}
 
