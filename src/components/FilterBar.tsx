@@ -57,9 +57,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onTestDataSource,
 }) => {
   return (
-    <div className="mb-6 flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <div className="flex flex-wrap gap-2">
+    <div className="mb-6 space-y-4">
+      {/* First row: Add Data Source and Test Data Source buttons */}
+      <div className="flex justify-between items-center">
+        <div className="flex space-x-3">
           <Button 
             variant="outline" 
             className="bg-white text-purple-500 border-purple-200 hover:bg-purple-50"
@@ -68,6 +69,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <Plus className="mr-1 h-4 w-4" />
             Add Data Source
           </Button>
+          
           <Button 
             variant="outline"
             className="bg-white text-purple-500 border-purple-200 hover:bg-purple-50"
@@ -77,8 +79,95 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             Test Data Source
           </Button>
         </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2 items-center">
+      {/* Second row: Filters, Search and Sort */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Left side - Filters */}
+        <div className="flex flex-wrap gap-2">
+          {/* Source Type Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
+                <Filter className="mr-1 h-4 w-4" />
+                Source Type {selectedSourceType && `(${selectedSourceType})`}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Filter by Source</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onFilterChange('sourceType', 'all')}>
+                <div className="flex items-center gap-2">
+                  <Checkbox checked={!selectedSourceType} />
+                  <span>All</span>
+                </div>
+              </DropdownMenuItem>
+              {sourceTypes.map(type => (
+                <DropdownMenuItem key={type} onClick={() => onFilterChange('sourceType', type)}>
+                  <div className="flex items-center gap-2">
+                    <Checkbox checked={selectedSourceType === type} />
+                    <span>{type}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Tags Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
+                Tags
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Filter by Tags</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {tags.map(tag => (
+                <DropdownMenuItem key={tag} onClick={() => onFilterChange('tag', tag)}>
+                  {tag}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Status Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
+                Status
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onFilterChange('status', 'active')}>
+                Active
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onFilterChange('status', 'inactive')}>
+                Inactive
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onFilterChange('status', 'all')}>
+                All
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Show All QnA Toggle */}
+          <Button 
+            variant={showAllQnA ? "default" : "outline"} 
+            className={showAllQnA 
+              ? "bg-purple-500 hover:bg-purple-600" 
+              : "bg-white border-purple-200 hover:bg-purple-50"
+            }
+            onClick={onToggleShowAll}
+          >
+            Show All QnA
+          </Button>
+        </div>
+
+        {/* Right side - Search and Sort */}
+        <div className="flex items-center gap-2">
           <SearchBar 
             className="w-72" 
             onSearch={onSearch}
@@ -134,88 +223,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {/* Source Type Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
-              <Filter className="mr-1 h-4 w-4" />
-              Source Type {selectedSourceType && `(${selectedSourceType})`}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Filter by Source</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onFilterChange('sourceType', 'all')}>
-              <div className="flex items-center gap-2">
-                <Checkbox checked={!selectedSourceType} />
-                <span>All</span>
-              </div>
-            </DropdownMenuItem>
-            {sourceTypes.map(type => (
-              <DropdownMenuItem key={type} onClick={() => onFilterChange('sourceType', type)}>
-                <div className="flex items-center gap-2">
-                  <Checkbox checked={selectedSourceType === type} />
-                  <span>{type}</span>
-                </div>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Tags Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
-              Tags
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Filter by Tags</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {tags.map(tag => (
-              <DropdownMenuItem key={tag} onClick={() => onFilterChange('tag', tag)}>
-                {tag}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Status Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-white border-purple-200 hover:bg-purple-50">
-              Status
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onFilterChange('status', 'active')}>
-              Active
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onFilterChange('status', 'inactive')}>
-              Inactive
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onFilterChange('status', 'all')}>
-              All
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Show All QnA Toggle */}
-        <Button 
-          variant={showAllQnA ? "default" : "outline"} 
-          className={showAllQnA 
-            ? "bg-purple-500 hover:bg-purple-600" 
-            : "bg-white border-purple-200 hover:bg-purple-50"
-          }
-          onClick={onToggleShowAll}
-        >
-          Show All QnA
-        </Button>
       </div>
     </div>
   );

@@ -1,95 +1,110 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { MultipleSelector, Option } from '@/components/MultipleSelector';
-import { DownloadCloud, UploadCloud } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface CsvUploadFormProps {
   onSubmit: (data: any) => void;
 }
 
 export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
-  const [fileName, setFileName] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedTags, setSelectedTags] = React.useState<Option[]>([]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setFileName(file.name);
-    }
-  };
+  const [name, setName] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [selectedTags, setSelectedTags] = useState<Option[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      file: selectedFile,
-      fileName,
-      tags: selectedTags.map(t => t.value),
-    });
+    
+    const formData = {
+      name,
+      file,
+      tags: selectedTags.map(tag => tag.value),
+    };
+    
+    onSubmit(formData);
   };
 
-  const handleDownloadSample = () => {
-    // In a real app, this would download a real CSV file
-    const sampleCsvContent = "Question,Answer\n\"What are your business hours?\",\"We are open Monday to Friday, 9 AM to 5 PM.\"\n\"Do you offer international shipping?\",\"Yes, we ship to most countries worldwide.\"\n\"What payment methods do you accept?\",\"We accept credit cards, PayPal, and bank transfers.\"";
-    const blob = new Blob([sampleCsvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'sample_qna.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const downloadSampleCsv = () => {
+    // Create sample CSV content
+    const csvContent = "question,answer,tags\n" +
+      "What products do you offer?,We offer a range of products in software hardware and services.,product general\n" +
+      "How can I contact customer support?,You can contact our customer support at support@example.com or call us at 123-456-7890.,support contact\n" +
+      "What is your refund policy?,We offer a 30-day money-back guarantee on all our products.,policy refund";
+    
+    // Create a blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a URL for the blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary link element to trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'sample_qna.csv');
+    
+    // Append the link to the body
+    document.body.appendChild(link);
+    
+    // Trigger the download
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const tagOptions: Option[] = [
     { label: 'Product', value: 'product' },
-    { label: 'FAQ', value: 'faq' },
     { label: 'Support', value: 'support' },
-    { label: 'Pricing', value: 'pricing' },
+    { label: 'Account', value: 'account' },
+    { label: 'Payments', value: 'payments' },
   ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex justify-end mb-2">
-        <Button 
-          type="button" 
-          variant="outline" 
-          className="flex items-center text-sm" 
-          onClick={handleDownloadSample}
-        >
-          <DownloadCloud className="h-4 w-4 mr-2" />
-          Download Sample CSV
-        </Button>
+      <div className="space-y-2">
+        <Label htmlFor="name">Name</Label>
+        <Input 
+          id="name" 
+          placeholder="Enter a name for this CSV source" 
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
       </div>
-      
-      <div className="space-y-2 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <UploadCloud className="h-12 w-12 text-gray-400" />
-          <div className="text-sm text-gray-500">
-            <Label htmlFor="csv-upload" className="cursor-pointer text-purple-500 hover:text-purple-600">
-              Click to upload
-            </Label>{' '}
-            or drag and drop
-          </div>
-          <p className="text-xs text-gray-500">
-            CSV file format (columns: Question, Answer)
-          </p>
-          {fileName && (
-            <p className="text-sm font-medium text-purple-500">{fileName}</p>
-          )}
+
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <Label htmlFor="csv-file">CSV File</Label>
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm"
+            className="text-purple-500"
+            onClick={downloadSampleCsv}
+          >
+            <Download className="h-4 w-4 mr-1" /> Download Sample CSV
+          </Button>
         </div>
         <Input 
-          id="csv-upload" 
-          type="file"
-          accept=".csv"
+          id="csv-file" 
+          type="file" 
+          accept=".csv" 
           onChange={handleFileChange}
-          className="hidden"
+          required
         />
+        <p className="text-sm text-gray-500">
+          Upload a CSV file with columns: question, answer, and optional tags.
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -105,10 +120,10 @@ export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
 
       <Button 
         type="submit" 
-        className="w-full mt-6 bg-purple-500 hover:bg-purple-600" 
-        disabled={!selectedFile}
+        className="w-full mt-6 bg-purple-500 hover:bg-purple-600"
+        disabled={!file || !name}
       >
-        Upload CSV
+        Upload & Process
       </Button>
     </form>
   );

@@ -1,16 +1,16 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { DataSource } from '@/types/DataSource';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { 
   ChevronDown, 
   ChevronRight, 
   FolderOpen, 
   FolderClosed, 
   FileText, 
-  Check, 
   Edit, 
   Trash2, 
   RefreshCcw, 
@@ -23,7 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
-import { StatusChangeDialog } from './StatusChangeDialog';
 import { EditableTags } from './EditableTags';
 
 interface DataSourceItemProps {
@@ -57,7 +56,6 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
 }) => {
   const isExpanded = expanded.has(dataSource.id);
   const hasChildren = dataSource.children && dataSource.children.length > 0;
-  const [showStatusDialog, setShowStatusDialog] = useState(false);
   
   const handleCheckboxChange = (checked: boolean) => {
     onSelectChange(dataSource.id, checked);
@@ -68,15 +66,10 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
     onToggleChildren(dataSource.id);
   };
 
-  const handleStatusClick = () => {
-    setShowStatusDialog(true);
-  };
-
-  const handleStatusConfirm = () => {
+  const handleStatusChange = (checked: boolean) => {
     if (onStatusChange) {
-      onStatusChange(dataSource.id, !dataSource.isActive);
+      onStatusChange(dataSource.id, checked);
     }
-    setShowStatusDialog(false);
   };
 
   const handleTagsChange = (newTags: string[]) => {
@@ -145,7 +138,14 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         </td>
         <td className="px-4 py-4">
           <div className="flex flex-col">
-            <span className={cn("line-clamp-1", dataSource.isFolder ? "font-medium" : "")}>
+            {/* Make the name clickable to view QnAs */}
+            <span 
+              className={cn(
+                "line-clamp-1 hover:text-purple-600 cursor-pointer", 
+                dataSource.isFolder ? "font-medium" : ""
+              )}
+              onClick={() => onViewQnA && onViewQnA(dataSource.id)}
+            >
               {dataSource.name}
             </span>
             {dataSource.url && (
@@ -158,20 +158,13 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
             )}
           </div>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap">
-          <Badge 
-            variant={dataSource.isActive ? "default" : "outline"}
-            className={cn(
-              "flex items-center gap-1 w-24 justify-center cursor-pointer",
-              dataSource.isActive 
-                ? "bg-green-100 text-green-800 hover:bg-green-200" 
-                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-            )}
-            onClick={handleStatusClick}
-          >
-            {dataSource.isActive && <Check className="h-3 w-3" />}
-            {dataSource.isActive ? "Active" : "Inactive"}
-          </Badge>
+        <td className="px-4 py-4 whitespace-nowrap text-center">
+          {/* Replace badge with toggle switch */}
+          <Switch 
+            checked={dataSource.isActive}
+            onCheckedChange={handleStatusChange}
+            className="data-[state=checked]:bg-green-500"
+          />
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
           {formattedDate}
@@ -181,18 +174,6 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         </td>
         <td className="pr-4 py-4">
           <div className="flex items-center justify-end gap-2">
-            {onViewQnA && (
-              <Button 
-                size="icon" 
-                variant="outline" 
-                className="h-8 w-8" 
-                onClick={() => onViewQnA(dataSource.id)}
-                title="View Q&As"
-              >
-                <FileText className="h-4 w-4" />
-              </Button>
-            )}
-            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="outline" className="h-8 w-8">
@@ -248,14 +229,6 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           onViewQnA={onViewQnA}
         />
       ))}
-
-      <StatusChangeDialog
-        isOpen={showStatusDialog}
-        onClose={() => setShowStatusDialog(false)}
-        onConfirm={handleStatusConfirm}
-        dataSourceName={dataSource.name}
-        currentStatus={dataSource.isActive}
-      />
     </>
   );
 };

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { DataSourceItem } from './DataSourceItem';
 import { DataSource } from '@/types/DataSource';
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import { BulkActions } from './BulkActions';
 import {
   Table,
@@ -155,7 +154,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                 </TableHead>
                 <TableHead className="w-32">Source</TableHead>
                 <TableHead>Name/URL</TableHead>
-                <TableHead className="w-28">Status</TableHead>
+                <TableHead className="w-24 text-center">Status</TableHead>
                 <TableHead className="w-40">Last Updated</TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead className="text-right w-24">Actions</TableHead>
@@ -170,12 +169,10 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onSelectChange={handleToggleSelect}
                   onToggleChildren={handleToggleExpand}
                   expanded={expandedIds}
-                  onStatusChange={(id, status) => {
-                    if (onStatusChange) onStatusChange(id, status);
-                  }}
+                  onStatusChange={onStatusChange}
                   onTagsChange={onTagsChange}
                   onEdit={onEdit}
-                  onDelete={(id) => onDelete([id])}
+                  onDelete={onDelete}
                   onResync={onResync}
                   onViewQnA={onViewQnA}
                 />
