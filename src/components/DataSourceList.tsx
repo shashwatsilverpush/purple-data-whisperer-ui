@@ -81,6 +81,11 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
     setSelectAll(false);
   };
 
+  // Create a handler to delete a single item
+  const handleDeleteSingle = (id: string) => {
+    onDelete([id]);
+  };
+
   const getTotalCount = (sources: DataSource[]): number => {
     let count = sources.length;
     sources.forEach(source => {
@@ -172,7 +177,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onStatusChange={onStatusChange}
                   onTagsChange={onTagsChange}
                   onEdit={onEdit}
-                  onDelete={onDelete}
+                  onDelete={handleDeleteSingle}
                   onResync={onResync}
                   onViewQnA={onViewQnA}
                 />
