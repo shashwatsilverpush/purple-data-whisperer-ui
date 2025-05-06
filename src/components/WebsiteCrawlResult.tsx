@@ -44,13 +44,13 @@ export const WebsiteCrawlResult: React.FC<WebsiteCrawlResultProps> = ({
     setSelectAll(newSelected.length === pages.length);
   };
 
-  const handleGenerateQnAs = () => {
+  const handleSubmit = () => {
     setIsProcessing(true);
-    // Simulate processing
+    // Submit selected pages
     setTimeout(() => {
       onGenerateQnAs();
       setIsProcessing(false);
-    }, 2000);
+    }, 1000);
   };
 
   return (
@@ -120,11 +120,11 @@ export const WebsiteCrawlResult: React.FC<WebsiteCrawlResultProps> = ({
 
       <div className="flex justify-end">
         <Button 
-          onClick={handleGenerateQnAs}
+          onClick={handleSubmit}
           disabled={selectedPages.length === 0 || isProcessing}
           className="bg-purple-500 hover:bg-purple-600"
         >
-          {isProcessing ? "Generating Q&As..." : "Generate Q&As"}
+          {isProcessing ? "Submitting..." : "Submit"}
         </Button>
       </div>
     </div>

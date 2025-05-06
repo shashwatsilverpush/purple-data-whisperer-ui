@@ -1,10 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sidebar, 
   SidebarContent, 
-  SidebarFooter, 
   SidebarGroup, 
   SidebarGroupContent, 
   SidebarGroupLabel, 
@@ -14,31 +13,17 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar';
-import { Database, FileQuestion, LogOut } from 'lucide-react';
-import { mockData } from '@/services/mockData';
-import { DataSource } from '@/types/DataSource';
-import { Button } from './ui/button';
+import { Database, FileQuestion } from 'lucide-react';
 
 export const AppSidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isOpen } = useSidebar();
-  const [activeItem, setActiveItem] = useState<string>('/');
-  const [dataSources, setDataSources] = useState<DataSource[]>([]);
+  const [activeItem, setActiveItem] = React.useState<string>('/');
 
-  useEffect(() => {
+  React.useEffect(() => {
     setActiveItem(location.pathname);
   }, [location]);
-
-  useEffect(() => {
-    // Get data sources for the sidebar
-    setDataSources(mockData);
-  }, []);
-
-  // Get source counts by type
-  const websiteCount = mockData.filter(source => source.sourceType === 'Website').length;
-  const manualQnACount = mockData.filter(source => source.sourceType === 'Manual QnA').length;
-  const csvCount = mockData.filter(source => source.sourceType === 'CSV').length;
 
   return (
     <>
@@ -84,60 +69,7 @@ export const AppSidebar: React.FC = () => {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          
-          <SidebarGroup>
-            <SidebarGroupLabel>Data Source Types</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <div className="space-y-1 px-2 text-sm">
-                <div className="flex items-center justify-between text-gray-500 py-1">
-                  <span>Website</span>
-                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                    {websiteCount}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-gray-500 py-1">
-                  <span>Manual Q&A</span>
-                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                    {manualQnACount}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-gray-500 py-1">
-                  <span>CSV</span>
-                  <span className="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                    {csvCount}
-                  </span>
-                </div>
-              </div>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          <SidebarGroup>
-            <SidebarGroupLabel>Recent Data Sources</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <div className="space-y-2 px-2">
-                {mockData.slice(0, 5).map(source => (
-                  <button 
-                    key={source.id}
-                    className="w-full text-left text-sm truncate text-gray-600 hover:text-purple-600 py-0.5"
-                    onClick={() => navigate(`/edit-data-source/${source.id}`)}
-                  >
-                    {source.name}
-                  </button>
-                ))}
-              </div>
-            </SidebarGroupContent>
-          </SidebarGroup>
         </SidebarContent>
-        
-        <SidebarFooter className="border-t border-gray-200">
-          <Button 
-            variant="outline" 
-            className="flex items-center w-full"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            <span>Logout</span>
-          </Button>
-        </SidebarFooter>
       </Sidebar>
     </>
   );
