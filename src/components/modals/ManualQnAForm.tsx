@@ -4,14 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MultipleSelector, Option } from '@/components/MultipleSelector';
 
 interface ManualQnAFormProps {
@@ -21,8 +13,6 @@ interface ManualQnAFormProps {
 export const ManualQnAForm: React.FC<ManualQnAFormProps> = ({ onSubmit }) => {
   const [question, setQuestion] = React.useState('');
   const [answer, setAnswer] = React.useState('');
-  const [category, setCategory] = React.useState('');
-  const [subCategory, setSubCategory] = React.useState('');
   const [selectedTags, setSelectedTags] = React.useState<Option[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -30,8 +20,6 @@ export const ManualQnAForm: React.FC<ManualQnAFormProps> = ({ onSubmit }) => {
     onSubmit({
       question,
       answer,
-      category,
-      subCategory,
       tags: selectedTags.map(t => t.value),
     });
   };
@@ -66,42 +54,6 @@ export const ManualQnAForm: React.FC<ManualQnAFormProps> = ({ onSubmit }) => {
           required
           rows={6}
         />
-      </div>
-
-      <div className="flex space-x-4">
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="category">Category</Label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="account">Account</SelectItem>
-                <SelectItem value="payments">Payments</SelectItem>
-                <SelectItem value="orders">Orders</SelectItem>
-                <SelectItem value="shipping">Shipping</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="sub-category">Sub-category</Label>
-          <Select value={subCategory} onValueChange={setSubCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select sub-category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="security">Security</SelectItem>
-                <SelectItem value="methods">Payment Methods</SelectItem>
-                <SelectItem value="tracking">Order Tracking</SelectItem>
-                <SelectItem value="delivery">Delivery</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <div className="space-y-2">

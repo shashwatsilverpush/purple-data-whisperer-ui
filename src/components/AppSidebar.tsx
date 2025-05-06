@@ -14,8 +14,8 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar';
-import { BarChart3, Database, FileQuestion, Settings, LogOut } from 'lucide-react';
-import { mockData, getAllCategories } from '@/services/mockData';
+import { Database, FileQuestion, LogOut } from 'lucide-react';
+import { mockData } from '@/services/mockData';
 import { DataSource } from '@/types/DataSource';
 import { Button } from './ui/button';
 
@@ -78,30 +78,6 @@ export const AppSidebar: React.FC = () => {
                     <button onClick={() => navigate('/qna')}>
                       <FileQuestion className="w-5 h-5 mr-2" />
                       <span>Q&A Library</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    asChild
-                    className="text-purple-800 hover:text-purple-900 hover:bg-purple-50"
-                  >
-                    <button>
-                      <BarChart3 className="w-5 h-5 mr-2" />
-                      <span>Analytics</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    asChild
-                    className="text-purple-800 hover:text-purple-900 hover:bg-purple-50"
-                  >
-                    <button>
-                      <Settings className="w-5 h-5 mr-2" />
-                      <span>Settings</span>
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { DataSourceItem } from './DataSourceItem';
 import { DataSource } from '@/types/DataSource';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { BulkActions } from './BulkActions';
 import {
   Table,
@@ -125,6 +127,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
             setSelectAll(false);
           }}
           selectedSources={selectedSources}
+          canResync={canResync}
           onResync={onResync ? () => {
             selectedSources.forEach(source => {
               if (onResync) onResync(source.id);
@@ -167,7 +170,9 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onSelectChange={handleToggleSelect}
                   onToggleChildren={handleToggleExpand}
                   expanded={expandedIds}
-                  onStatusChange={onStatusChange}
+                  onStatusChange={(id, status) => {
+                    if (onStatusChange) onStatusChange(id, status);
+                  }}
                   onTagsChange={onTagsChange}
                   onEdit={onEdit}
                   onDelete={(id) => onDelete([id])}

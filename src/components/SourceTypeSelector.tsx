@@ -41,7 +41,7 @@ export const SourceTypeSelector: React.FC<SourceTypeSelectorProps> = ({ onSelect
         {sourceTypes.map((type) => (
           <Card 
             key={type.id}
-            className="cursor-pointer hover:border-purple-300 transition-all hover:shadow-md"
+            className="cursor-pointer hover:border-purple-300 transition-all hover:shadow-md aspect-square flex flex-col"
             onClick={() => onSelect(type.id as 'website' | 'manual' | 'csv')}
           >
             <CardHeader>
@@ -50,12 +50,17 @@ export const SourceTypeSelector: React.FC<SourceTypeSelectorProps> = ({ onSelect
               </div>
               <CardTitle className="text-center">{type.title}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-32 bg-gray-100 rounded-md mb-4 flex items-center justify-center overflow-hidden">
-                {/* This would be a GIF in a real implementation */}
-                <div className="text-gray-400 text-sm">
-                  Illustration for {type.title}
-                </div>
+            <CardContent className="flex-1 flex flex-col items-center justify-center">
+              <div className="h-32 bg-gray-100 rounded-md mb-4 flex items-center justify-center overflow-hidden w-full">
+                {/* GIF representation of the data source type */}
+                <img 
+                  src={type.gifUrl} 
+                  alt={`${type.title} process`} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://placehold.co/300x200/e9e9e9/7e22ce?text="+type.title;
+                  }}
+                />
               </div>
               <CardDescription className="text-sm text-center">
                 {type.description}

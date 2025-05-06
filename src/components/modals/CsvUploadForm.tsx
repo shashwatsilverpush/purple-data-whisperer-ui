@@ -3,16 +3,8 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MultipleSelector, Option } from '@/components/MultipleSelector';
-import { UploadCloud } from 'lucide-react';
+import { DownloadCloud, UploadCloud } from 'lucide-react';
 
 interface CsvUploadFormProps {
   onSubmit: (data: any) => void;
@@ -21,8 +13,6 @@ interface CsvUploadFormProps {
 export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [category, setCategory] = React.useState('');
-  const [subCategory, setSubCategory] = React.useState('');
   const [selectedTags, setSelectedTags] = React.useState<Option[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,10 +28,22 @@ export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
     onSubmit({
       file: selectedFile,
       fileName,
-      category,
-      subCategory,
       tags: selectedTags.map(t => t.value),
     });
+  };
+
+  const handleDownloadSample = () => {
+    // In a real app, this would download a real CSV file
+    const sampleCsvContent = "Question,Answer\n\"What are your business hours?\",\"We are open Monday to Friday, 9 AM to 5 PM.\"\n\"Do you offer international shipping?\",\"Yes, we ship to most countries worldwide.\"\n\"What payment methods do you accept?\",\"We accept credit cards, PayPal, and bank transfers.\"";
+    const blob = new Blob([sampleCsvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'sample_qna.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const tagOptions: Option[] = [
@@ -53,6 +55,18 @@ export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex justify-end mb-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex items-center text-sm" 
+          onClick={handleDownloadSample}
+        >
+          <DownloadCloud className="h-4 w-4 mr-2" />
+          Download Sample CSV
+        </Button>
+      </div>
+      
       <div className="space-y-2 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
         <div className="flex flex-col items-center justify-center space-y-2">
           <UploadCloud className="h-12 w-12 text-gray-400" />
@@ -63,7 +77,7 @@ export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
             or drag and drop
           </div>
           <p className="text-xs text-gray-500">
-            CSV file format (columns: Question, Answer, Category, Sub-category)
+            CSV file format (columns: Question, Answer)
           </p>
           {fileName && (
             <p className="text-sm font-medium text-purple-500">{fileName}</p>
@@ -78,44 +92,8 @@ export const CsvUploadForm: React.FC<CsvUploadFormProps> = ({ onSubmit }) => {
         />
       </div>
 
-      <div className="flex space-x-4">
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="category">Default Category</Label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="products">Products</SelectItem>
-                <SelectItem value="shipping">Shipping</SelectItem>
-                <SelectItem value="account">Account</SelectItem>
-                <SelectItem value="payments">Payments</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="sub-category">Default Sub-category</Label>
-          <Select value={subCategory} onValueChange={setSubCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select sub-category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="faqs">FAQs</SelectItem>
-                <SelectItem value="warranty">Warranty</SelectItem>
-                <SelectItem value="returns">Returns</SelectItem>
-                <SelectItem value="international">International</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       <div className="space-y-2">
-        <Label>Default Tags</Label>
+        <Label>Tags</Label>
         <MultipleSelector
           placeholder="Select tags..."
           value={selectedTags}

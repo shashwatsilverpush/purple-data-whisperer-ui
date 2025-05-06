@@ -157,19 +157,6 @@ export const QnASection: React.FC<QnASectionProps> = ({ dataSourceId }) => {
 
       <div className="flex flex-col md:flex-row gap-4 items-end">
         <div className="w-full md:w-1/3">
-          <Label className="mb-1 block">Search Q&As</Label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search questions or answers..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        <div className="w-full md:w-1/4">
           <Label className="mb-1 block">Filter by Source</Label>
           <Select 
             value={selectedSource || ''}
@@ -189,7 +176,7 @@ export const QnASection: React.FC<QnASectionProps> = ({ dataSourceId }) => {
           </Select>
         </div>
 
-        <div className="w-full md:w-1/4">
+        <div className="w-full md:w-1/3">
           <Label className="mb-1 block">Filter by Tags</Label>
           <MultipleSelector
             placeholder="Select tags..."
@@ -199,56 +186,68 @@ export const QnASection: React.FC<QnASectionProps> = ({ dataSourceId }) => {
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="whitespace-nowrap"
-            >
-              Sort by {sortField === 'createdAt' ? 'Date' : 'Question'}
-              {sortDirection === 'asc' ? <ArrowUp className="ml-1 h-4 w-4" /> : <ArrowDown className="ml-1 h-4 w-4" />}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem 
-              onClick={() => {
-                setSortField('createdAt');
-                setSortDirection('desc');
-              }}
-              className={sortField === 'createdAt' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
-            >
-              Newest First
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => {
-                setSortField('createdAt');
-                setSortDirection('asc');
-              }}
-              className={sortField === 'createdAt' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
-            >
-              Oldest First
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => {
-                setSortField('question');
-                setSortDirection('asc');
-              }}
-              className={sortField === 'question' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
-            >
-              Question (A-Z)
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => {
-                setSortField('question');
-                setSortDirection('desc');
-              }}
-              className={sortField === 'question' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
-            >
-              Question (Z-A)
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="w-full md:w-1/4 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="whitespace-nowrap"
+              >
+                {sortDirection === 'asc' ? <ArrowUp className="mr-1 h-4 w-4" /> : <ArrowDown className="mr-1 h-4 w-4" />}
+                {sortField === 'createdAt' ? 'Date' : 'Question'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem 
+                onClick={() => {
+                  setSortField('createdAt');
+                  setSortDirection('desc');
+                }}
+                className={sortField === 'createdAt' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
+              >
+                Newest First
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  setSortField('createdAt');
+                  setSortDirection('asc');
+                }}
+                className={sortField === 'createdAt' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
+              >
+                Oldest First
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  setSortField('question');
+                  setSortDirection('asc');
+                }}
+                className={sortField === 'question' && sortDirection === 'asc' ? 'bg-purple-50' : ''}
+              >
+                Question (A-Z)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  setSortField('question');
+                  setSortDirection('desc');
+                }}
+                className={sortField === 'question' && sortDirection === 'desc' ? 'bg-purple-50' : ''}
+              >
+                Question (Z-A)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="border rounded-md">
