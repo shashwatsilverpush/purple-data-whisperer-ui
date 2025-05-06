@@ -13,7 +13,8 @@ import {
   Check, 
   Edit, 
   Trash2, 
-  RefreshCcw 
+  RefreshCcw, 
+  Link
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -34,6 +35,10 @@ interface DataSourceItemProps {
   expanded: Set<string>;
   onStatusChange?: (id: string, newStatus: boolean) => void;
   onTagsChange?: (id: string, newTags: string[]) => void;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onResync?: (id: string) => void;
+  onViewQnA?: (id: string) => void;
 }
 
 export const DataSourceItem: React.FC<DataSourceItemProps> = ({ 
@@ -44,7 +49,11 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   onToggleChildren,
   expanded,
   onStatusChange,
-  onTagsChange
+  onTagsChange,
+  onEdit,
+  onDelete,
+  onResync,
+  onViewQnA
 }) => {
   const isExpanded = expanded.has(dataSource.id);
   const hasChildren = dataSource.children && dataSource.children.length > 0;
@@ -95,6 +104,9 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
     return null;
   };
 
+  // Determine available actions based on source type
+  const showResync = dataSource.sourceType === 'Website';
+
   return (
     <>
       <tr 
@@ -132,9 +144,19 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           </div>
         </td>
         <td className="px-4 py-4">
-          <span className={cn("line-clamp-1", dataSource.isFolder ? "font-medium" : "")}>
-            {dataSource.name}
-          </span>
+          <div className="flex flex-col">
+            <span className={cn("line-clamp-1", dataSource.isFolder ? "font-medium" : "")}>
+              {dataSource.name}
+            </span>
+            {dataSource.url && (
+              <div className="flex items-center text-xs text-purple-600 mt-1">
+                <Link className="h-3 w-3 mr-1" /> 
+                <a href={dataSource.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {dataSource.url}
+                </a>
+              </div>
+            )}
+          </div>
         </td>
         <td className="px-4 py-4 whitespace-nowrap">
           <Badge 
@@ -154,39 +176,49 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
           {formattedDate}
         </td>
-        <td className="px-4 py-4 whitespace-nowrap">
-          {dataSource.category}
-        </td>
-        <td className="px-4 py-4 whitespace-nowrap">
-          {dataSource.subCategory}
-        </td>
         <td className="px-4 py-4">
           <EditableTags tags={dataSource.tags} onTagsChange={handleTagsChange} />
         </td>
         <td className="pr-4 py-4">
           <div className="flex items-center justify-end gap-2">
+            {onViewQnA && (
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="h-8 w-8" 
+                onClick={() => onViewQnA(dataSource.id)}
+                title="View Q&As"
+              >
+                <FileText className="h-4 w-4" />
+              </Button>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="outline" className="h-8 w-8">
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">Actions</span>
                   <Edit className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <div className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">
-                  <div className="flex items-center gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </div>
-                </DropdownMenuItem>
-                {dataSource.sourceType === 'Website' && (
-                  <DropdownMenuItem>
+                {onEdit && (
+                  <DropdownMenuItem onClick={() => onEdit(dataSource.id)}>
+                    <div className="flex items-center gap-2">
+                      <Edit className="h-4 w-4" />
+                      Edit
+                    </div>
+                  </DropdownMenuItem>
+                )}
+                {onDelete && (
+                  <DropdownMenuItem className="text-red-600" onClick={() => onDelete(dataSource.id)}>
+                    <div className="flex items-center gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </div>
+                  </DropdownMenuItem>
+                )}
+                {onResync && showResync && (
+                  <DropdownMenuItem onClick={() => onResync(dataSource.id)}>
                     <div className="flex items-center gap-2">
                       <RefreshCcw className="h-4 w-4" />
                       Re-sync
@@ -210,6 +242,10 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           expanded={expanded}
           onStatusChange={onStatusChange}
           onTagsChange={onTagsChange}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onResync={onResync}
+          onViewQnA={onViewQnA}
         />
       ))}
 

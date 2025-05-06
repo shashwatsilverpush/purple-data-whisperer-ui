@@ -3,16 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MultipleSelector, Option } from '@/components/MultipleSelector';
 
 interface WebsiteFormProps {
@@ -22,21 +13,22 @@ interface WebsiteFormProps {
 export const WebsiteForm: React.FC<WebsiteFormProps> = ({ onSubmit }) => {
   const [url, setUrl] = React.useState('');
   const [scanType, setScanType] = React.useState('individual');
-  const [category, setCategory] = React.useState('');
-  const [subCategory, setSubCategory] = React.useState('');
   const [selectedTags, setSelectedTags] = React.useState<Option[]>([]);
-  const [isMultipage, setIsMultipage] = React.useState(true);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      url,
-      scanType,
-      category,
-      subCategory,
-      tags: selectedTags.map(t => t.value),
-      isMultipage
-    });
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      onSubmit({
+        url,
+        scanType,
+        tags: selectedTags.map(t => t.value),
+      });
+      setIsSubmitting(false);
+    }, 1000);
   };
 
   const tagOptions: Option[] = [
@@ -47,7 +39,7 @@ export const WebsiteForm: React.FC<WebsiteFormProps> = ({ onSubmit }) => {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="website-url">Website URL</Label>
         <Input 
@@ -57,6 +49,9 @@ export const WebsiteForm: React.FC<WebsiteFormProps> = ({ onSubmit }) => {
           onChange={(e) => setUrl(e.target.value)}
           required
         />
+        <p className="text-xs text-gray-500">
+          Enter the URL of the website you want to crawl. For best results, use the homepage or main content page.
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -73,42 +68,6 @@ export const WebsiteForm: React.FC<WebsiteFormProps> = ({ onSubmit }) => {
         </RadioGroup>
       </div>
 
-      <div className="flex space-x-4">
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="category">Category</Label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="e-commerce">E-commerce</SelectItem>
-                <SelectItem value="blog">Blog</SelectItem>
-                <SelectItem value="documentation">Documentation</SelectItem>
-                <SelectItem value="support">Support</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2 w-1/2">
-          <Label htmlFor="sub-category">Sub-category</Label>
-          <Select value={subCategory} onValueChange={setSubCategory}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select sub-category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="electronics">Electronics</SelectItem>
-                <SelectItem value="clothing">Clothing</SelectItem>
-                <SelectItem value="tech">Technology</SelectItem>
-                <SelectItem value="faq">FAQ</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       <div className="space-y-2">
         <Label>Tags</Label>
         <MultipleSelector
@@ -118,18 +77,18 @@ export const WebsiteForm: React.FC<WebsiteFormProps> = ({ onSubmit }) => {
           options={tagOptions}
           creatable
         />
+        <p className="text-xs text-gray-500">
+          Tags help organize and filter your data sources. You can create new tags by typing and pressing Enter.
+        </p>
       </div>
 
-      <div className="flex items-center space-x-2 pt-2">
-        <Checkbox 
-          id="multipage" 
-          checked={isMultipage}
-          onCheckedChange={(checked) => setIsMultipage(checked as boolean)}
-        />
-        <Label htmlFor="multipage">Process all nested pages</Label>
-      </div>
-
-      <Button type="submit" className="w-full mt-6 bg-purple-500 hover:bg-purple-600">Add Website</Button>
+      <Button 
+        type="submit" 
+        className="w-full mt-6 bg-purple-500 hover:bg-purple-600"
+        disabled={isSubmitting || !url}
+      >
+        {isSubmitting ? "Processing..." : "Crawl Website"}
+      </Button>
     </form>
   );
 };

@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { SearchBar } from '@/components/SearchBar';
 import { FilterBar } from '@/components/FilterBar';
 import { DataSourceList } from '@/components/DataSourceList';
 import { AddDataSourceModal } from '@/components/modals/AddDataSourceModal';
@@ -11,6 +12,7 @@ import { DataSource } from '@/types/DataSource';
 import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [dataSources, setDataSources] = useState<DataSource[]>(mockData);
   const [filteredSources, setFilteredSources] = useState<DataSource[]>(mockData);
   const [searchQuery, setSearchQuery] = useState('');
@@ -169,6 +171,23 @@ const Index = () => {
       title: "Data Source Added",
       description: `New ${type} data source has been added.`,
     });
+    setShowAddModal(false);
+  };
+
+  const handleEditDataSource = (id: string) => {
+    navigate(`/edit-data-source/${id}`);
+  };
+
+  const handleResyncDataSource = (id: string) => {
+    // In a real app, this would trigger a re-sync of the data source
+    toast({
+      title: "Re-sync Initiated",
+      description: "The data source is being re-synchronized.",
+    });
+  };
+
+  const handleViewQnA = (id: string) => {
+    navigate(`/qna/${id}`);
   };
 
   return (
@@ -176,12 +195,6 @@ const Index = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-purple-800">Data Sources</h1>
-          <div className="w-72">
-            <SearchBar 
-              className="w-full" 
-              onSearch={handleSearch}
-            />
-          </div>
         </div>
 
         <FilterBar 
@@ -190,6 +203,7 @@ const Index = () => {
           subCategories={subCategories}
           tags={tags}
           onFilterChange={handleFilterChange}
+          onSearch={handleSearch}
           onSortChange={handleSortChange}
           onToggleShowAll={() => setShowAllQnA(!showAllQnA)}
           showAllQnA={showAllQnA}
@@ -205,6 +219,9 @@ const Index = () => {
           onDelete={handleDelete} 
           onStatusChange={handleStatusChange}
           onTagsChange={handleTagsChange}
+          onEdit={handleEditDataSource}
+          onResync={handleResyncDataSource}
+          onViewQnA={handleViewQnA}
         />
       </div>
 

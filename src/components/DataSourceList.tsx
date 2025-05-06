@@ -1,14 +1,25 @@
+
 import React, { useState } from 'react';
 import { DataSourceItem } from './DataSourceItem';
 import { DataSource } from '@/types/DataSource';
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActions } from './BulkActions';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 interface DataSourceListProps {
   dataSources: DataSource[];
   onDelete: (ids: string[]) => void;
   onStatusChange?: (id: string, newStatus: boolean) => void;
   onTagsChange?: (id: string, newTags: string[]) => void;
+  onEdit?: (id: string) => void;
+  onResync?: (id: string) => void;
+  onViewQnA?: (id: string) => void;
 }
 
 export const DataSourceList: React.FC<DataSourceListProps> = ({
@@ -16,6 +27,9 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
   onDelete,
   onStatusChange,
   onTagsChange,
+  onEdit,
+  onResync,
+  onViewQnA
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -67,12 +81,6 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
     setSelectAll(false);
   };
 
-  const handleTagsChange = (id: string, newTags: string[]) => {
-    if (onTagsChange) {
-      onTagsChange(id, newTags);
-    }
-  };
-
   const getTotalCount = (sources: DataSource[]): number => {
     let count = sources.length;
     sources.forEach(source => {
@@ -82,17 +90,6 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
     });
     return count;
   };
-
-  const includeFolders = Array.from(selectedIds).some(id => {
-    const findFolder = (sources: DataSource[]): boolean => {
-      for (const source of sources) {
-        if (source.id === id && source.isFolder) return true;
-        if (source.children && findFolder(source.children)) return true;
-      }
-      return false;
-    };
-    return findFolder(dataSources);
-  });
 
   // Get all selected data sources for BulkActions
   const getSelectedSources = (): DataSource[] => {
@@ -114,6 +111,9 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
   };
 
   const selectedSources = getSelectedSources();
+  
+  // Determine if we can offer resync based on selected sources
+  const canResync = selectedSources.every(source => source.sourceType === 'Website');
 
   return (
     <div>
@@ -126,15 +126,23 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
             setSelectAll(false);
           }}
           selectedSources={selectedSources}
+          canResync={canResync}
+          onResync={onResync ? () => {
+            selectedSources.forEach(source => {
+              if (onResync) onResync(source.id);
+            });
+            setSelectedIds(new Set());
+            setSelectAll(false);
+          } : undefined}
         />
       )}
       
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-purple-50">
-              <tr>
-                <th scope="col" className="pl-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
+          <Table>
+            <TableHeader className="bg-purple-50">
+              <TableRow>
+                <TableHead className="pl-4 w-16">
                   <div className="flex items-center">
                     <Checkbox 
                       checked={selectAll}
@@ -143,34 +151,16 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                     />
                     S.No.
                   </div>
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Source
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Name
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Last Updated
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Category
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Sub-category
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Tags
-                </th>
-                <th scope="col" className="pr-4 py-3 text-right text-xs font-medium text-purple-800 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+                </TableHead>
+                <TableHead className="w-32">Source</TableHead>
+                <TableHead>Name/URL</TableHead>
+                <TableHead className="w-28">Status</TableHead>
+                <TableHead className="w-40">Last Updated</TableHead>
+                <TableHead>Tags</TableHead>
+                <TableHead className="text-right w-24">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {dataSources.map((dataSource) => (
                 <DataSourceItem
                   key={dataSource.id}
@@ -180,11 +170,15 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onToggleChildren={handleToggleExpand}
                   expanded={expandedIds}
                   onStatusChange={onStatusChange}
-                  onTagsChange={handleTagsChange}
+                  onTagsChange={onTagsChange}
+                  onEdit={onEdit}
+                  onDelete={(id) => onDelete([id])}
+                  onResync={onResync}
+                  onViewQnA={onViewQnA}
                 />
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>
