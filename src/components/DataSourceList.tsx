@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DataSourceItem } from './DataSourceItem';
 import { DataSource } from '@/types/DataSource';
@@ -126,7 +125,6 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
             setSelectAll(false);
           }}
           selectedSources={selectedSources}
-          canResync={canResync}
           onResync={onResync ? () => {
             selectedSources.forEach(source => {
               if (onResync) onResync(source.id);

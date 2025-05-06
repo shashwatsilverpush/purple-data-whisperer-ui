@@ -9,13 +9,17 @@ interface BulkActionsProps {
   onDelete: () => void;
   onClearSelection: () => void;
   selectedSources: DataSource[];
+  canResync?: boolean;
+  onResync?: () => void;
 }
 
 export const BulkActions: React.FC<BulkActionsProps> = ({ 
   selectedCount, 
   onDelete, 
   onClearSelection,
-  selectedSources
+  selectedSources,
+  canResync,
+  onResync
 }) => {
   if (selectedCount === 0) return null;
 
@@ -53,11 +57,12 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
         </Button>
 
         {/* Only show re-sync if all selected items are websites */}
-        {allWebsites && (
+        {allWebsites && onResync && (
           <Button 
             variant="outline" 
             size="sm"
             className="bg-white border-purple-200 hover:bg-purple-50"
+            onClick={onResync}
           >
             <RefreshCcw className="h-4 w-4 mr-1" />
             Re-sync All
