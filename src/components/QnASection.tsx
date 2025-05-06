@@ -172,14 +172,14 @@ export const QnASection: React.FC<QnASectionProps> = ({ dataSourceId }) => {
         <div className="w-full md:w-1/4">
           <Label className="mb-1 block">Filter by Source</Label>
           <Select 
-            value={selectedSource || ''} 
+            value={selectedSource || ''}
             onValueChange={(value) => setSelectedSource(value || null)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Sources" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Sources</SelectItem>
+              <SelectItem value="all-sources">All Sources</SelectItem>
               {sources.map(source => (
                 <SelectItem key={source.id} value={source.id}>
                   {source.name}

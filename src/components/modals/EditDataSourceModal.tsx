@@ -381,6 +381,7 @@ export const EditDataSourceModal: React.FC<EditDataSourceModalProps> = ({
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {categoryOptions.map(cat => (
                         <SelectItem key={cat} value={cat.toLowerCase()}>
                           {cat}
@@ -397,6 +398,7 @@ export const EditDataSourceModal: React.FC<EditDataSourceModalProps> = ({
                       <SelectValue placeholder="Select sub-category" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {subcategoryOptions.map(subcat => (
                         <SelectItem key={subcat} value={subcat.toLowerCase()}>
                           {subcat}
