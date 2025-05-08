@@ -24,6 +24,8 @@ const Index = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [showAllQnA, setShowAllQnA] = useState(false);
   const [selectedSourceType, setSelectedSourceType] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'main' | 'nested' | 'qna'>('main');
+  const [currentSourceId, setCurrentSourceId] = useState<string | null>(null);
 
   // Get filter options
   const categories = getAllCategories();
@@ -35,9 +37,26 @@ const Index = () => {
   useEffect(() => {
     let filtered = [...dataSources];
     
-    // Apply source type filter
-    if (selectedSourceType) {
-      filtered = filtered.filter(source => source.sourceType === selectedSourceType);
+    // If we're in nested view, filter to show only children of current source
+    if (currentView === 'nested' && currentSourceId) {
+      const findSource = (sources: DataSource[], id: string): DataSource | null => {
+        for (const source of sources) {
+          if (source.id === id) return source;
+          if (source.children) {
+            const found = findSource(source.children, id);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      
+      const currentSource = findSource(dataSources, currentSourceId);
+      filtered = currentSource?.children || [];
+    } else if (currentView === 'main') {
+      // Apply source type filter only in main view
+      if (selectedSourceType) {
+        filtered = filtered.filter(source => source.sourceType === selectedSourceType);
+      }
     }
     
     // Apply search filter
@@ -63,7 +82,7 @@ const Index = () => {
     });
 
     setFilteredSources(filtered);
-  }, [dataSources, searchQuery, sortField, sortDirection, selectedSourceType, showAllQnA]);
+  }, [dataSources, searchQuery, sortField, sortDirection, selectedSourceType, showAllQnA, currentView, currentSourceId]);
 
   const handleFilterChange = (filterType: string, value: string) => {
     if (filterType === 'sourceType') {
@@ -190,11 +209,71 @@ const Index = () => {
     navigate(`/qna/${id}`);
   };
 
+  const handleViewNestedUrls = (id: string) => {
+    // Set the current source ID and change view to nested
+    setCurrentSourceId(id);
+    setCurrentView('nested');
+    
+    // Find source name for title
+    const findSource = (sources: DataSource[], id: string): DataSource | undefined => {
+      for (const source of sources) {
+        if (source.id === id) return source;
+        if (source.children) {
+          const found = findSource(source.children, id);
+          if (found) return found;
+        }
+      }
+      return undefined;
+    };
+    
+    const source = findSource(dataSources, id);
+    
+    toast({
+      title: "Viewing Nested URLs",
+      description: `Displaying URLs for ${source?.name || 'selected source'}`,
+    });
+  };
+
+  const handleBackToMain = () => {
+    setCurrentView('main');
+    setCurrentSourceId(null);
+  };
+
+  // Get the current view title
+  const getViewTitle = () => {
+    if (currentView === 'main') {
+      return "Data Sources";
+    } else if (currentView === 'nested' && currentSourceId) {
+      const findSource = (sources: DataSource[], id: string): DataSource | undefined => {
+        for (const source of sources) {
+          if (source.id === id) return source;
+          if (source.children) {
+            const found = findSource(source.children, id);
+            if (found) return found;
+          }
+        }
+        return undefined;
+      };
+      
+      const source = findSource(dataSources, currentSourceId);
+      return `URLs for ${source?.name || 'Source'}`;
+    }
+    
+    return "Data Sources";
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-purple-800">Data Sources</h1>
+          <div className="flex items-center gap-2">
+            {currentView !== 'main' && (
+              <Button variant="ghost" onClick={handleBackToMain} className="mr-2">
+                ← Back to Data Sources
+              </Button>
+            )}
+            <h1 className="text-2xl font-bold text-purple-800">{getViewTitle()}</h1>
+          </div>
         </div>
 
         <FilterBar 
@@ -222,6 +301,7 @@ const Index = () => {
           onEdit={handleEditDataSource}
           onResync={handleResyncDataSource}
           onViewQnA={handleViewQnA}
+          onViewNestedUrls={handleViewNestedUrls}
         />
       </div>
 

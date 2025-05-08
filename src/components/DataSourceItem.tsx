@@ -38,6 +38,7 @@ interface DataSourceItemProps {
   onDelete?: (id: string) => void;
   onResync?: (id: string) => void;
   onViewQnA?: (id: string) => void;
+  onViewNestedUrls?: (id: string) => void;
 }
 
 export const DataSourceItem: React.FC<DataSourceItemProps> = ({ 
@@ -52,7 +53,8 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   onEdit,
   onDelete,
   onResync,
-  onViewQnA
+  onViewQnA,
+  onViewNestedUrls
 }) => {
   const isExpanded = expanded.has(dataSource.id);
   const hasChildren = dataSource.children && dataSource.children.length > 0;
@@ -75,6 +77,28 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
   const handleTagsChange = (newTags: string[]) => {
     if (onTagsChange) {
       onTagsChange(dataSource.id, newTags);
+    }
+  };
+
+  const handleItemClick = () => {
+    if (dataSource.sourceType === 'Website') {
+      // For website sources or nested items, determine the navigation
+      if (dataSource.parentId) {
+        // This is a nested URL, navigate to Q&A view
+        if (onViewQnA) {
+          onViewQnA(dataSource.id);
+        }
+      } else {
+        // This is a main website source, navigate to nested URLs view
+        if (onViewNestedUrls) {
+          onViewNestedUrls(dataSource.id);
+        }
+      }
+    } else {
+      // For Manual Q&A and CSV, navigate directly to Q&A view
+      if (onViewQnA) {
+        onViewQnA(dataSource.id);
+      }
     }
   };
 
@@ -138,13 +162,13 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         </td>
         <td className="px-4 py-4">
           <div className="flex flex-col">
-            {/* Make the name clickable to view QnAs */}
+            {/* Make the name clickable to view QnAs or nested URLs based on source type */}
             <span 
               className={cn(
                 "line-clamp-1 hover:text-purple-600 cursor-pointer", 
                 dataSource.isFolder ? "font-medium" : ""
               )}
-              onClick={() => onViewQnA && onViewQnA(dataSource.id)}
+              onClick={handleItemClick}
             >
               {dataSource.name}
             </span>
@@ -168,6 +192,12 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
           {formattedDate}
+        </td>
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+          {dataSource.category || "-"}
+        </td>
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+          {dataSource.subCategory || "-"}
         </td>
         <td className="px-4 py-4">
           <EditableTags tags={dataSource.tags} onTagsChange={handleTagsChange} />
@@ -227,6 +257,7 @@ export const DataSourceItem: React.FC<DataSourceItemProps> = ({
           onDelete={onDelete}
           onResync={onResync}
           onViewQnA={onViewQnA}
+          onViewNestedUrls={onViewNestedUrls}
         />
       ))}
     </>

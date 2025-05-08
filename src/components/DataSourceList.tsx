@@ -20,6 +20,7 @@ interface DataSourceListProps {
   onEdit?: (id: string) => void;
   onResync?: (id: string) => void;
   onViewQnA?: (id: string) => void;
+  onViewNestedUrls?: (id: string) => void;
 }
 
 export const DataSourceList: React.FC<DataSourceListProps> = ({
@@ -29,7 +30,8 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
   onTagsChange,
   onEdit,
   onResync,
-  onViewQnA
+  onViewQnA,
+  onViewNestedUrls
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -161,6 +163,8 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                 <TableHead>Name/URL</TableHead>
                 <TableHead className="w-24 text-center">Status</TableHead>
                 <TableHead className="w-40">Last Updated</TableHead>
+                <TableHead className="w-40">Category</TableHead>
+                <TableHead className="w-40">Sub Category</TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead className="text-right w-24">Actions</TableHead>
               </TableRow>
@@ -180,6 +184,7 @@ export const DataSourceList: React.FC<DataSourceListProps> = ({
                   onDelete={handleDeleteSingle}
                   onResync={onResync}
                   onViewQnA={onViewQnA}
+                  onViewNestedUrls={onViewNestedUrls}
                 />
               ))}
             </TableBody>
